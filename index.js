@@ -16,18 +16,19 @@ let globalStore = {}
 // function for checking a password
 checkPassword = async (username, plaintextPassword) => {
     // TODO: Make sure to delete this console.log once you're done implementing the function!
-    console.log('\n Uh-oh, checkPassword is not yet implemented. 😢')
+
     // Ensure global store contains the user 
     // (this is a quick way to check if an object contains a key)
     if (globalStore[username]) {
         // TODO: Use bcrypt's compare methof to compare a plaintext password to a password hash
+        const hashedPassword = globalStore[username].passwordHash;
+        const result = await bcrypt.compare(plaintextPassword, hashedPassword);
 
         // TODO: The result variable is a boolean. True means the user was valid. Take action accordingly.
         if (result) {
             // TODO: Display message for valid credentials
-        }
-        else {
-            // TODO: Display message for invalid credentials
+            console.log('\n✔️ You have successfully logged in.\n')
+
         }
     }
     else {
@@ -37,15 +38,20 @@ checkPassword = async (username, plaintextPassword) => {
 }
 
 hashPassword = async (username, password) => {
-    // TODO: Make sure to delete this console.log once you're done implementing the function!
-    console.log('\nUh-oh, hashPassword is not yet implemented. 😢')
+    // Make the password hash using bcrypt
+    const saltRounds = 10; // Number of salt rounds, higher values make the hashing slower but more secure
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // TODO: Make the password hash using bcrypt
+    // Add the user and password hash to the global store object
+    globalStore[username] = {
+        passwordHash: hashedPassword
+    };
 
-    // TODO: Add the user and password hash to the global store object
-
-    // TODO: Print a status update including the username and password hash
+    // Print a status update including the username and password hash
+    console.log(`\n✅ Password for user '${username}' has been successfully hashed and stored.`);
+    console.log(`   Password Hash: ${hashedPassword}\n`);
 }
+
 
 
 
@@ -95,7 +101,7 @@ viewStore = () => {
 
     // Print each user
     for (let key in globalStore) {
-        console.log(`${key}: ${globalStore[key]}`)
+        console.log(`${key}: ${globalStore[key].passwordHash}`)
     }
 
     // Some lines to break it up visually
